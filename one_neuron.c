@@ -13,12 +13,12 @@ typedef struct Neuron
 } neuro;
 
 float respostas_espera[][2] = {
-    {1, 5},
-    {2, 10},
-    {3, 15},
-    {4, 20},
-    {5, 25},
-    {6, 30},
+    {1, 2},
+    {2, 4},
+    {3, 6},
+    {4, 8},
+    {5, 10},
+    {6, 12},
 };
 
 float rand_float(void)
@@ -63,9 +63,14 @@ int main()
     float ajuste = 1e-3;
     ajustar(ajuste, &neuronio1.peso, &neuronio1.bias);
     printf("peso: %f, bias: %f\n", neuronio1.peso, neuronio1.bias);
+
+    /*
     for (int i = 0; i < tam_treino; i++)
     {
         neuronio1.result = respostas_espera[i][0] * neuronio1.peso + neuronio1.bias;
         printf("temos: %.4f queriamos: %.4f\n", neuronio1.result, respostas_espera[i][1]);
     }
+    */
+
+    printf("%f ", neuronio1.peso * 1 + neuronio1.bias);
 }
