@@ -34,7 +34,7 @@ int main(void)
     ----------------------------DEFINITION OF BASICS--------------------------------------------------------------
     */
     float inputs[number_inputs] = {0, 1};
-    float output[number_outputs] = {1};
+    float exp_output[number_outputs] = {1};
     float result;
     float error;
 
@@ -62,8 +62,8 @@ int main(void)
 
     result = get_result(layers, inputs);
     // printf("%f", get_result(layers, inputs));
-    error = output[0] - result;
-    printf("We had : %.2f,\nWe wanted: %.2f,\nThe error was: %f\n", result, output[0], error);
+    error = exp_output[0] - result;
+    printf("We had : %.2f,\nWe wanted: %.2f,\nThe error was: %f\n", result, exp_output[0], error);
 }
 
 void get_rweights(layer *layers)
