@@ -8,11 +8,14 @@
 #define number_layers 2
 #define number_inputs 2
 #define number_outputs 1
+#define momentum 1
+#define learning_rate 0.1
 
 typedef struct neuro
 {
     float value;
     float *weights;
+    float delta;
 } neuron;
 
 typedef struct layer
@@ -27,6 +30,12 @@ void get_rweights(layer *layers);
 float get_result(layer *layers, float *inputs);
 
 float activate(float result); // Activation funciontion using sigmoid
+
+float derivate(float result); // derivative function
+
+float get_delta(float error, float derivate); // delta to use in the gradient function
+
+float backpropagate(layer *layers, float delta_out); // applies the backpropagation to adjust the weights
 
 int main(void)
 {
@@ -58,12 +67,27 @@ int main(void)
         }
     }
 
+    // Initialize the values
+    for (int i = 0; i < layers[0].size; i++)
+    {
+        layers[0].neurons[i].value = inputs[i];
+    }
+
     get_rweights(layers);
 
     result = get_result(layers, inputs);
     // printf("%f", get_result(layers, inputs));
     error = exp_output[0] - result;
     printf("We had : %.2f,\nWe wanted: %.2f,\nThe error was: %f\n", result, exp_output[0], error);
+
+    while (error > 0.01 || error < -0.01)
+    {
+        backpropagate(layers, get_delta(error, derivate(result)));
+        result = get_result(layers, inputs);
+        error = exp_output[0] - result;
+    }
+
+    printf("After BP\nWe had : %.2f,\nWe wanted: %.2f,\nThe error was: %f\n", result, exp_output[0], error);
 }
 
 void get_rweights(layer *layers)
@@ -84,12 +108,6 @@ void get_rweights(layer *layers)
 
 float get_result(layer *layers, float *inputs)
 {
-    // Initialize the values
-    for (int i = 0; i < layers[0].size; i++)
-    {
-        layers[0].neurons[i].value = inputs[i];
-    }
-
     // Propagates the values att with the weights
     for (int i = 0; i < number_layers - 1; i++)
     {
@@ -131,4 +149,34 @@ float activate(float result)
     float one = 1;
     result *= -1;
     return (one / (one + (pow(e, result))));
+}
+
+float derivate(float result)
+{
+    return (result * (1 - result));
+}
+
+float get_delta(float error, float derivate)
+{
+    return (error * derivate);
+}
+
+//----------------------------------------OUT OF CONTROL FUNCTION: WARNING----------------------------------------------
+float backpropagate(layer *layers, float delta_output)
+{
+    for (int i = number_layers - 1; i >= 0; i--)
+    {
+        for (int j = 0; j < layers[i].size; j++)
+        {
+            for (int k = 0; k < layers[i].num_weights; k++)
+            {
+                float current_weight = layers[i].neurons[j].weights[k];
+                float value = layers[i].neurons[j].value;
+                float derivated = derivate(value);
+                float current_delta = derivated * current_weight * delta_output;
+                current_weight = (current_weight * momentum) + (value * current_delta * learning_rate);
+                layers[i].neurons[j].weights[k] = current_weight;
+            }
+        }
+    }
 }
